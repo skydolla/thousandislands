@@ -1,57 +1,60 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { MapPin } from "@/lib/types";
 
 interface MapComponentProps {
   pins: MapPin[];
-  onPinClick: (tripId: string, islandId: string) => void;
+  onPinClick: (islandId: string) => void;
+}
+
+function toGeoJSON(pins: MapPin[]): GeoJSON.FeatureCollection {
+  return {
+    type: "FeatureCollection",
+    features: pins.map((pin) => ({
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [pin.longitude, pin.latitude],
+      },
+      properties: {
+        islandId: pin.islandId,
+        islandName: pin.islandName,
+        country: pin.country,
+      },
+    })),
+  };
 }
 
 export default function MapComponent({ pins, onPinClick }: MapComponentProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
+  // The map is created once; these refs let its event handlers see the latest props
+  // without tearing down and rebuilding the map.
+  const pinsRef = useRef(pins);
+  const onPinClickRef = useRef(onPinClick);
 
-  const handlePinClick = useCallback(
-    (tripId: string, islandId: string) => {
-      onPinClick(tripId, islandId);
-    },
-    [onPinClick]
-  );
+  useEffect(() => {
+    onPinClickRef.current = onPinClick;
+  }, [onPinClick]);
+
+  useEffect(() => {
+    pinsRef.current = pins;
+    const source = mapRef.current?.getSource("islands") as
+      | maplibregl.GeoJSONSource
+      | undefined;
+    source?.setData(toGeoJSON(pins));
+  }, [pins]);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
     const map = new maplibregl.Map({
       container: containerRef.current,
-      style: {
-        version: 8,
-        name: "Dark",
-        sources: {
-          "carto-dark": {
-            type: "raster",
-            tiles: [
-              "https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png",
-              "https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png",
-              "https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png",
-            ],
-            tileSize: 256,
-            attribution:
-              '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
-          },
-        },
-        layers: [
-          {
-            id: "carto-dark-layer",
-            type: "raster",
-            source: "carto-dark",
-            minzoom: 0,
-            maxzoom: 20,
-          },
-        ],
-      },
+      // OpenFreeMap: free, keyless vector tiles (CARTO raster tiles now require an API key).
+      style: "https://tiles.openfreemap.org/styles/dark",
       center: [20, 15],
       zoom: 2,
       minZoom: 1.5,
@@ -61,27 +64,9 @@ export default function MapComponent({ pins, onPinClick }: MapComponentProps) {
     map.addControl(new maplibregl.NavigationControl(), "bottom-right");
 
     map.on("load", () => {
-      const geojson: GeoJSON.FeatureCollection = {
-        type: "FeatureCollection",
-        features: pins.map((pin) => ({
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: [pin.longitude, pin.latitude],
-          },
-          properties: {
-            tripId: pin.tripId,
-            tripName: pin.tripName,
-            islandId: pin.islandId,
-            islandName: pin.islandName,
-            country: pin.country,
-          },
-        })),
-      };
-
       map.addSource("islands", {
         type: "geojson",
-        data: geojson,
+        data: toGeoJSON(pinsRef.current),
         cluster: true,
         clusterMaxZoom: 14,
         clusterRadius: 50,
@@ -129,7 +114,7 @@ export default function MapComponent({ pins, onPinClick }: MapComponentProps) {
         layout: {
           "text-field": "{point_count_abbreviated}",
           "text-size": 13,
-          "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+          "text-font": ["Noto Sans Bold"],
         },
         paint: {
           "text-color": "#ffffff",
@@ -160,7 +145,7 @@ export default function MapComponent({ pins, onPinClick }: MapComponentProps) {
           "text-size": 11,
           "text-offset": [0, 1.8],
           "text-anchor": "top",
-          "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
+          "text-font": ["Noto Sans Regular"],
           "text-max-width": 10,
         },
         paint: {
@@ -211,7 +196,7 @@ export default function MapComponent({ pins, onPinClick }: MapComponentProps) {
           });
         }
 
-        handlePinClick(props.tripId, props.islandId);
+        onPinClickRef.current(props.islandId);
       });
 
       map.on("mouseenter", "clusters", () => {
@@ -234,7 +219,7 @@ export default function MapComponent({ pins, onPinClick }: MapComponentProps) {
       map.remove();
       mapRef.current = null;
     };
-  }, [pins, handlePinClick]);
+  }, []);
 
   return (
     <div

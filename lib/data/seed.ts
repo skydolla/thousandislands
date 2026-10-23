@@ -400,6 +400,7 @@ export const tripIslands: TripIsland[] = [
   // Trip 11: Greek Island Cruise (2 islands)
   { id: "ti-018", tripId: "trip-011", islandId: "isl-018", sequenceNumber: 1, createdAt: "2024-01-01T00:00:00Z" },
   { id: "ti-019", tripId: "trip-011", islandId: "isl-019", sequenceNumber: 2, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "ti-021", tripId: "trip-011", islandId: "isl-001", sequenceNumber: 3, createdAt: "2024-01-01T00:00:00Z" },
   // Trip 12: Barbados (single island)
   { id: "ti-020", tripId: "trip-012", islandId: "isl-020", sequenceNumber: 1, createdAt: "2024-01-01T00:00:00Z" },
 ];
@@ -438,78 +439,78 @@ export const tripAttendees: TripAttendee[] = [
 
 export const pictures: Picture[] = [
   // Santorini (ti-001)
-  { id: "pic-001", tripId: "trip-001", tripIslandId: "ti-001", imageUrl: "https://picsum.photos/seed/santorini1/800/600", caption: "Oia sunset over the caldera", takenAt: "2023-09-13T18:30:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
-  { id: "pic-002", tripId: "trip-001", tripIslandId: "ti-001", imageUrl: "https://picsum.photos/seed/santorini2/800/600", caption: "Blue-domed churches of Fira", takenAt: "2023-09-14T10:00:00Z", sortOrder: 2, createdAt: "2024-01-01T00:00:00Z" },
-  { id: "pic-003", tripId: "trip-001", tripIslandId: "ti-001", imageUrl: "https://picsum.photos/seed/santorini3/800/600", caption: "Red Beach volcanic cliffs", takenAt: "2023-09-15T14:00:00Z", sortOrder: 3, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-001", tripIslandId: "ti-001", imageUrl: "https://picsum.photos/seed/santorini1/800/600", storageKey: null, width: 800, height: 600, caption: "Oia sunset over the caldera", takenAt: "2023-09-13T18:30:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-002", tripIslandId: "ti-001", imageUrl: "https://picsum.photos/seed/santorini2/800/600", storageKey: null, width: 800, height: 600, caption: "Blue-domed churches of Fira", takenAt: "2023-09-14T10:00:00Z", sortOrder: 2, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-003", tripIslandId: "ti-001", imageUrl: "https://picsum.photos/seed/santorini3/800/600", storageKey: null, width: 800, height: 600, caption: "Red Beach volcanic cliffs", takenAt: "2023-09-15T14:00:00Z", sortOrder: 3, createdAt: "2024-01-01T00:00:00Z" },
 
   // Bequia (ti-002)
-  { id: "pic-004", tripId: "trip-002", tripIslandId: "ti-002", imageUrl: "https://picsum.photos/seed/bequia1/800/600", caption: "Arriving at Port Elizabeth harbor", takenAt: "2024-06-10T11:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
-  { id: "pic-005", tripId: "trip-002", tripIslandId: "ti-002", imageUrl: "https://picsum.photos/seed/bequia2/800/600", caption: "Princess Margaret Beach", takenAt: "2024-06-11T15:00:00Z", sortOrder: 2, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-004", tripIslandId: "ti-002", imageUrl: "https://picsum.photos/seed/bequia1/800/600", storageKey: null, width: 800, height: 600, caption: "Arriving at Port Elizabeth harbor", takenAt: "2024-06-10T11:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-005", tripIslandId: "ti-002", imageUrl: "https://picsum.photos/seed/bequia2/800/600", storageKey: null, width: 800, height: 600, caption: "Princess Margaret Beach", takenAt: "2024-06-11T15:00:00Z", sortOrder: 2, createdAt: "2024-01-01T00:00:00Z" },
 
   // Mustique (ti-003)
-  { id: "pic-006", tripId: "trip-002", tripIslandId: "ti-003", imageUrl: "https://picsum.photos/seed/mustique1/800/600", caption: "Macaroni Beach", takenAt: "2024-06-13T12:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-006", tripIslandId: "ti-003", imageUrl: "https://picsum.photos/seed/mustique1/800/600", storageKey: null, width: 800, height: 600, caption: "Macaroni Beach", takenAt: "2024-06-13T12:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
 
   // Canouan (ti-004)
-  { id: "pic-007", tripId: "trip-002", tripIslandId: "ti-004", imageUrl: "https://picsum.photos/seed/canouan1/800/600", caption: "Canouan reef from the hilltop", takenAt: "2024-06-15T09:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-007", tripIslandId: "ti-004", imageUrl: "https://picsum.photos/seed/canouan1/800/600", storageKey: null, width: 800, height: 600, caption: "Canouan reef from the hilltop", takenAt: "2024-06-15T09:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
 
   // Maui (ti-005)
-  { id: "pic-008", tripId: "trip-003", tripIslandId: "ti-005", imageUrl: "https://picsum.photos/seed/maui1/800/600", caption: "Road to Hana", takenAt: "2024-03-02T10:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
-  { id: "pic-009", tripId: "trip-003", tripIslandId: "ti-005", imageUrl: "https://picsum.photos/seed/maui2/800/600", caption: "Haleakalā sunrise", takenAt: "2024-03-03T06:00:00Z", sortOrder: 2, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-008", tripIslandId: "ti-005", imageUrl: "https://picsum.photos/seed/maui1/800/600", storageKey: null, width: 800, height: 600, caption: "Road to Hana", takenAt: "2024-03-02T10:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-009", tripIslandId: "ti-005", imageUrl: "https://picsum.photos/seed/maui2/800/600", storageKey: null, width: 800, height: 600, caption: "Haleakalā sunrise", takenAt: "2024-03-03T06:00:00Z", sortOrder: 2, createdAt: "2024-01-01T00:00:00Z" },
 
   // Oahu (ti-006)
-  { id: "pic-010", tripId: "trip-003", tripIslandId: "ti-006", imageUrl: "https://picsum.photos/seed/oahu1/800/600", caption: "Waikiki Beach at dusk", takenAt: "2024-03-06T18:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
-  { id: "pic-011", tripId: "trip-003", tripIslandId: "ti-006", imageUrl: "https://picsum.photos/seed/oahu2/800/600", caption: "North Shore waves", takenAt: "2024-03-07T14:00:00Z", sortOrder: 2, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-010", tripIslandId: "ti-006", imageUrl: "https://picsum.photos/seed/oahu1/800/600", storageKey: null, width: 800, height: 600, caption: "Waikiki Beach at dusk", takenAt: "2024-03-06T18:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-011", tripIslandId: "ti-006", imageUrl: "https://picsum.photos/seed/oahu2/800/600", storageKey: null, width: 800, height: 600, caption: "North Shore waves", takenAt: "2024-03-07T14:00:00Z", sortOrder: 2, createdAt: "2024-01-01T00:00:00Z" },
 
   // Big Island (ti-007)
-  { id: "pic-012", tripId: "trip-003", tripIslandId: "ti-007", imageUrl: "https://picsum.photos/seed/bigisland1/800/600", caption: "Kīlauea lava fields", takenAt: "2024-03-10T16:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-012", tripIslandId: "ti-007", imageUrl: "https://picsum.photos/seed/bigisland1/800/600", storageKey: null, width: 800, height: 600, caption: "Kīlauea lava fields", takenAt: "2024-03-10T16:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
 
   // Bali (ti-008)
-  { id: "pic-013", tripId: "trip-004", tripIslandId: "ti-008", imageUrl: "https://picsum.photos/seed/bali1/800/600", caption: "Tegallalang rice terraces", takenAt: "2023-11-07T09:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
-  { id: "pic-014", tripId: "trip-004", tripIslandId: "ti-008", imageUrl: "https://picsum.photos/seed/bali2/800/600", caption: "Uluwatu temple at sunset", takenAt: "2023-11-09T17:30:00Z", sortOrder: 2, createdAt: "2024-01-01T00:00:00Z" },
-  { id: "pic-015", tripId: "trip-004", tripIslandId: "ti-008", imageUrl: "https://picsum.photos/seed/bali3/800/600", caption: "Surfing in Canggu", takenAt: "2023-11-11T08:00:00Z", sortOrder: 3, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-013", tripIslandId: "ti-008", imageUrl: "https://picsum.photos/seed/bali1/800/600", storageKey: null, width: 800, height: 600, caption: "Tegallalang rice terraces", takenAt: "2023-11-07T09:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-014", tripIslandId: "ti-008", imageUrl: "https://picsum.photos/seed/bali2/800/600", storageKey: null, width: 800, height: 600, caption: "Uluwatu temple at sunset", takenAt: "2023-11-09T17:30:00Z", sortOrder: 2, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-015", tripIslandId: "ti-008", imageUrl: "https://picsum.photos/seed/bali3/800/600", storageKey: null, width: 800, height: 600, caption: "Surfing in Canggu", takenAt: "2023-11-11T08:00:00Z", sortOrder: 3, createdAt: "2024-01-01T00:00:00Z" },
 
   // Zanzibar (ti-009)
-  { id: "pic-016", tripId: "trip-005", tripIslandId: "ti-009", imageUrl: "https://picsum.photos/seed/zanzibar1/800/600", caption: "Stone Town alleyways", takenAt: "2024-02-19T10:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
-  { id: "pic-017", tripId: "trip-005", tripIslandId: "ti-009", imageUrl: "https://picsum.photos/seed/zanzibar2/800/600", caption: "Nungwi Beach", takenAt: "2024-02-20T15:00:00Z", sortOrder: 2, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-016", tripIslandId: "ti-009", imageUrl: "https://picsum.photos/seed/zanzibar1/800/600", storageKey: null, width: 800, height: 600, caption: "Stone Town alleyways", takenAt: "2024-02-19T10:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-017", tripIslandId: "ti-009", imageUrl: "https://picsum.photos/seed/zanzibar2/800/600", storageKey: null, width: 800, height: 600, caption: "Nungwi Beach", takenAt: "2024-02-20T15:00:00Z", sortOrder: 2, createdAt: "2024-01-01T00:00:00Z" },
 
   // Capri (ti-010)
-  { id: "pic-018", tripId: "trip-006", tripIslandId: "ti-010", imageUrl: "https://picsum.photos/seed/capri1/800/600", caption: "Faraglioni rocks from the sea", takenAt: "2024-07-20T12:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
-  { id: "pic-019", tripId: "trip-006", tripIslandId: "ti-010", imageUrl: "https://picsum.photos/seed/capri2/800/600", caption: "View from Monte Solaro", takenAt: "2024-07-20T15:00:00Z", sortOrder: 2, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-018", tripIslandId: "ti-010", imageUrl: "https://picsum.photos/seed/capri1/800/600", storageKey: null, width: 800, height: 600, caption: "Faraglioni rocks from the sea", takenAt: "2024-07-20T12:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-019", tripIslandId: "ti-010", imageUrl: "https://picsum.photos/seed/capri2/800/600", storageKey: null, width: 800, height: 600, caption: "View from Monte Solaro", takenAt: "2024-07-20T15:00:00Z", sortOrder: 2, createdAt: "2024-01-01T00:00:00Z" },
 
   // Santa Cruz (ti-011)
-  { id: "pic-020", tripId: "trip-007", tripIslandId: "ti-011", imageUrl: "https://picsum.photos/seed/galapagos1/800/600", caption: "Giant tortoise at Charles Darwin Station", takenAt: "2024-04-06T10:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
-  { id: "pic-021", tripId: "trip-007", tripIslandId: "ti-011", imageUrl: "https://picsum.photos/seed/galapagos2/800/600", caption: "Tortuga Bay beach", takenAt: "2024-04-07T14:00:00Z", sortOrder: 2, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-020", tripIslandId: "ti-011", imageUrl: "https://picsum.photos/seed/galapagos1/800/600", storageKey: null, width: 800, height: 600, caption: "Giant tortoise at Charles Darwin Station", takenAt: "2024-04-06T10:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-021", tripIslandId: "ti-011", imageUrl: "https://picsum.photos/seed/galapagos2/800/600", storageKey: null, width: 800, height: 600, caption: "Tortuga Bay beach", takenAt: "2024-04-07T14:00:00Z", sortOrder: 2, createdAt: "2024-01-01T00:00:00Z" },
 
   // Isabela (ti-012)
-  { id: "pic-022", tripId: "trip-007", tripIslandId: "ti-012", imageUrl: "https://picsum.photos/seed/isabela1/800/600", caption: "Marine iguanas on the lava rocks", takenAt: "2024-04-09T11:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-022", tripIslandId: "ti-012", imageUrl: "https://picsum.photos/seed/isabela1/800/600", storageKey: null, width: 800, height: 600, caption: "Marine iguanas on the lava rocks", takenAt: "2024-04-09T11:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
 
   // Bermuda (ti-013)
-  { id: "pic-023", tripId: "trip-008", tripIslandId: "ti-013", imageUrl: "https://picsum.photos/seed/bermuda1/800/600", caption: "Horseshoe Bay pink sand", takenAt: "2024-08-16T13:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
-  { id: "pic-024", tripId: "trip-008", tripIslandId: "ti-013", imageUrl: "https://picsum.photos/seed/bermuda2/800/600", caption: "Crystal Cave formations", takenAt: "2024-08-17T10:00:00Z", sortOrder: 2, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-023", tripIslandId: "ti-013", imageUrl: "https://picsum.photos/seed/bermuda1/800/600", storageKey: null, width: 800, height: 600, caption: "Horseshoe Bay pink sand", takenAt: "2024-08-16T13:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-024", tripIslandId: "ti-013", imageUrl: "https://picsum.photos/seed/bermuda2/800/600", storageKey: null, width: 800, height: 600, caption: "Crystal Cave formations", takenAt: "2024-08-17T10:00:00Z", sortOrder: 2, createdAt: "2024-01-01T00:00:00Z" },
 
   // Phi Phi Don (ti-014)
-  { id: "pic-025", tripId: "trip-009", tripIslandId: "ti-014", imageUrl: "https://picsum.photos/seed/phiphi1/800/600", caption: "Viewpoint overlooking Tonsai Bay", takenAt: "2024-01-09T08:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
-  { id: "pic-026", tripId: "trip-009", tripIslandId: "ti-014", imageUrl: "https://picsum.photos/seed/phiphi2/800/600", caption: "Long Beach snorkeling", takenAt: "2024-01-09T15:00:00Z", sortOrder: 2, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-025", tripIslandId: "ti-014", imageUrl: "https://picsum.photos/seed/phiphi1/800/600", storageKey: null, width: 800, height: 600, caption: "Viewpoint overlooking Tonsai Bay", takenAt: "2024-01-09T08:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-026", tripIslandId: "ti-014", imageUrl: "https://picsum.photos/seed/phiphi2/800/600", storageKey: null, width: 800, height: 600, caption: "Long Beach snorkeling", takenAt: "2024-01-09T15:00:00Z", sortOrder: 2, createdAt: "2024-01-01T00:00:00Z" },
 
   // Phi Phi Leh (ti-015)
-  { id: "pic-027", tripId: "trip-009", tripIslandId: "ti-015", imageUrl: "https://picsum.photos/seed/phiphileh1/800/600", caption: "Maya Bay — the famous beach", takenAt: "2024-01-10T11:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-027", tripIslandId: "ti-015", imageUrl: "https://picsum.photos/seed/phiphileh1/800/600", storageKey: null, width: 800, height: 600, caption: "Maya Bay — the famous beach", takenAt: "2024-01-10T11:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
 
   // Malé (ti-016)
-  { id: "pic-028", tripId: "trip-010", tripIslandId: "ti-016", imageUrl: "https://picsum.photos/seed/male1/800/600", caption: "Aerial view arriving by seaplane", takenAt: "2024-12-20T14:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-028", tripIslandId: "ti-016", imageUrl: "https://picsum.photos/seed/male1/800/600", storageKey: null, width: 800, height: 600, caption: "Aerial view arriving by seaplane", takenAt: "2024-12-20T14:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
 
   // Maafushi (ti-017)
-  { id: "pic-029", tripId: "trip-010", tripIslandId: "ti-017", imageUrl: "https://picsum.photos/seed/maafushi1/800/600", caption: "Overwater bungalow at sunset", takenAt: "2024-12-22T18:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
-  { id: "pic-030", tripId: "trip-010", tripIslandId: "ti-017", imageUrl: "https://picsum.photos/seed/maafushi2/800/600", caption: "Diving with manta rays", takenAt: "2024-12-23T09:00:00Z", sortOrder: 2, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-029", tripIslandId: "ti-017", imageUrl: "https://picsum.photos/seed/maafushi1/800/600", storageKey: null, width: 800, height: 600, caption: "Overwater bungalow at sunset", takenAt: "2024-12-22T18:00:00Z", sortOrder: 1, createdAt: "2024-01-01T00:00:00Z" },
+  { id: "pic-030", tripIslandId: "ti-017", imageUrl: "https://picsum.photos/seed/maafushi2/800/600", storageKey: null, width: 800, height: 600, caption: "Diving with manta rays", takenAt: "2024-12-23T09:00:00Z", sortOrder: 2, createdAt: "2024-01-01T00:00:00Z" },
 
   // Mykonos (ti-018)
-  { id: "pic-031", tripId: "trip-011", tripIslandId: "ti-018", imageUrl: "https://picsum.photos/seed/mykonos1/800/600", caption: "Little Venice waterfront", takenAt: "2025-05-11T19:00:00Z", sortOrder: 1, createdAt: "2025-01-01T00:00:00Z" },
-  { id: "pic-032", tripId: "trip-011", tripIslandId: "ti-018", imageUrl: "https://picsum.photos/seed/mykonos2/800/600", caption: "Windmills at sunset", takenAt: "2025-05-12T18:30:00Z", sortOrder: 2, createdAt: "2025-01-01T00:00:00Z" },
+  { id: "pic-031", tripIslandId: "ti-018", imageUrl: "https://picsum.photos/seed/mykonos1/800/600", storageKey: null, width: 800, height: 600, caption: "Little Venice waterfront", takenAt: "2025-05-11T19:00:00Z", sortOrder: 1, createdAt: "2025-01-01T00:00:00Z" },
+  { id: "pic-032", tripIslandId: "ti-018", imageUrl: "https://picsum.photos/seed/mykonos2/800/600", storageKey: null, width: 800, height: 600, caption: "Windmills at sunset", takenAt: "2025-05-12T18:30:00Z", sortOrder: 2, createdAt: "2025-01-01T00:00:00Z" },
 
   // Crete (ti-019)
-  { id: "pic-033", tripId: "trip-011", tripIslandId: "ti-019", imageUrl: "https://picsum.photos/seed/crete1/800/600", caption: "Samariá Gorge hike", takenAt: "2025-05-14T08:00:00Z", sortOrder: 1, createdAt: "2025-01-01T00:00:00Z" },
-  { id: "pic-034", tripId: "trip-011", tripIslandId: "ti-019", imageUrl: "https://picsum.photos/seed/crete2/800/600", caption: "Elafonissi pink sand beach", takenAt: "2025-05-15T14:00:00Z", sortOrder: 2, createdAt: "2025-01-01T00:00:00Z" },
+  { id: "pic-033", tripIslandId: "ti-019", imageUrl: "https://picsum.photos/seed/crete1/800/600", storageKey: null, width: 800, height: 600, caption: "Samariá Gorge hike", takenAt: "2025-05-14T08:00:00Z", sortOrder: 1, createdAt: "2025-01-01T00:00:00Z" },
+  { id: "pic-034", tripIslandId: "ti-019", imageUrl: "https://picsum.photos/seed/crete2/800/600", storageKey: null, width: 800, height: 600, caption: "Elafonissi pink sand beach", takenAt: "2025-05-15T14:00:00Z", sortOrder: 2, createdAt: "2025-01-01T00:00:00Z" },
 
   // Barbados (ti-020)
-  { id: "pic-035", tripId: "trip-012", tripIslandId: "ti-020", imageUrl: "https://picsum.photos/seed/barbados1/800/600", caption: "Crane Beach waves", takenAt: "2025-02-02T11:00:00Z", sortOrder: 1, createdAt: "2025-01-01T00:00:00Z" },
-  { id: "pic-036", tripId: "trip-012", tripIslandId: "ti-020", imageUrl: "https://picsum.photos/seed/barbados2/800/600", caption: "Mount Gay rum distillery tour", takenAt: "2025-02-04T14:00:00Z", sortOrder: 2, createdAt: "2025-01-01T00:00:00Z" },
+  { id: "pic-035", tripIslandId: "ti-020", imageUrl: "https://picsum.photos/seed/barbados1/800/600", storageKey: null, width: 800, height: 600, caption: "Crane Beach waves", takenAt: "2025-02-02T11:00:00Z", sortOrder: 1, createdAt: "2025-01-01T00:00:00Z" },
+  { id: "pic-036", tripIslandId: "ti-020", imageUrl: "https://picsum.photos/seed/barbados2/800/600", storageKey: null, width: 800, height: 600, caption: "Mount Gay rum distillery tour", takenAt: "2025-02-04T14:00:00Z", sortOrder: 2, createdAt: "2025-01-01T00:00:00Z" },
 ];

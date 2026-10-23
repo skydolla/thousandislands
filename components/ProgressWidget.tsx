@@ -9,15 +9,32 @@ interface ProgressWidgetProps {
 
 export default function ProgressWidget({ visible }: ProgressWidgetProps) {
   const [progress, setProgress] = useState<ProgressResponse | null>(null);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     fetch("/api/progress")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`Failed to load progress (${res.status})`);
+        return res.json();
+      })
       .then((data: ProgressResponse) => setProgress(data))
-      .catch(() => {});
+      .catch((err) => {
+        console.error(err);
+        setFailed(true);
+      });
   }, []);
 
-  if (!visible || !progress) return null;
+  if (!visible) return null;
+
+  if (failed) {
+    return (
+      <div className="absolute top-4 left-4 z-10 bg-zinc-900/90 backdrop-blur-md border border-zinc-700/50 rounded-xl px-4 py-3 shadow-lg text-xs text-zinc-500">
+        Progress unavailable
+      </div>
+    );
+  }
+
+  if (!progress) return null;
 
   const pct = Math.min(
     (progress.uniqueIslandsVisited / progress.goal) * 100,

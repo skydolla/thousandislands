@@ -44,9 +44,11 @@ export interface TripAttendee {
 
 export interface Picture {
   id: string;
-  tripId: string;
   tripIslandId: string;
   imageUrl: string;
+  storageKey: string | null;
+  width: number | null;
+  height: number | null;
   caption: string | null;
   takenAt: string | null;
   sortOrder: number | null;
@@ -55,15 +57,21 @@ export interface Picture {
 
 // --- API response shapes ---
 
-export interface MapPin {
+export interface MapPinTrip {
   tripId: string;
   tripName: string;
+  startDate: string;
+}
+
+export interface MapPin {
   islandId: string;
   islandName: string;
   country: string;
   regionOrState: string | null;
   latitude: number;
   longitude: number;
+  /** Every trip that visited this island, most recent first. */
+  trips: MapPinTrip[];
 }
 
 export interface MapPinsResponse {
