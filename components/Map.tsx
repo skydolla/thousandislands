@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { MapPin } from "@/lib/types";
+import { MAP_STYLE_URL } from "@/lib/map-style";
 
 interface MapComponentProps {
   pins: MapPin[];
@@ -53,8 +54,7 @@ export default function MapComponent({ pins, onPinClick }: MapComponentProps) {
 
     const map = new maplibregl.Map({
       container: containerRef.current,
-      // OpenFreeMap: free, keyless vector tiles (CARTO raster tiles now require an API key).
-      style: "https://tiles.openfreemap.org/styles/dark",
+      style: MAP_STYLE_URL,
       center: [20, 15],
       zoom: 2,
       minZoom: 1.5,

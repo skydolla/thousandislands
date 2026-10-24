@@ -120,6 +120,14 @@ export interface TripDetailResponse {
   };
 }
 
+export interface TripSummary {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  islandCount: number;
+}
+
 export interface ProgressResponse {
   uniqueIslandsVisited: number;
   goal: number;
@@ -127,7 +135,13 @@ export interface ProgressResponse {
 
 export interface ApiError {
   error: {
-    code: "BAD_REQUEST" | "NOT_FOUND" | "INTERNAL_ERROR";
+    code:
+      | "BAD_REQUEST"
+      | "UNAUTHORIZED"
+      | "FORBIDDEN"
+      | "NOT_FOUND"
+      | "CONFLICT"
+      | "INTERNAL_ERROR";
     message: string;
   };
 }
