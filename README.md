@@ -9,6 +9,7 @@ Click a pin to see the trip(s) that reached that island, who came along, and pho
 - **Map:** MapLibre GL with OpenFreeMap's dark vector style (free, no API key)
 - **Data + login:** Supabase (Postgres, Row Level Security, email/password auth)
 - **Photos:** Cloudflare R2. Browsers resize photos to 2048px and upload them straight to R2 via presigned URLs
+- **iOS:** Expo (React Native) app in `mobile/`, using the same API. Built with EAS and installed via TestFlight
 
 Anyone can view the map. Only accounts listed in the `owners` table can edit, and the
 database enforces that for every write.
@@ -32,7 +33,9 @@ npm run dev                  # http://localhost:3000 — edit trips at /admin
   Environment variables are set in the Vercel project (everything in `.env.example` except `SUPABASE_DB_URL`).
 - **Keep-alive:** Vercel Cron calls `/api/health` daily (`vercel.json`), because Supabase's free plan
   pauses projects after a week without activity.
-- **CI:** `.github/workflows/ci.yml` runs lint, type-check, tests and build on every PR.
+- **CI:** `.github/workflows/ci.yml` runs lint, type-check, tests and build on every PR, for both the
+  web app and the iOS app.
+- **Skipped deploys:** `ignoreCommand` in `vercel.json` skips the web deploy when a commit only changes `mobile/`.
 - **Backups:** `.github/workflows/backup.yml` exports the trip data weekly (Mondays) as a downloadable
   artifact kept 90 days. Needs the `SUPABASE_DB_URL` repository secret. Run it manually from
   Actions → Database backup → Run workflow.
@@ -81,3 +84,4 @@ Reads are public; writes need the owner's session cookie (web) or `Authorization
 | `components/*` | Map, trip modal, photo carousel, progress widget; `components/admin/*` editing UI |
 | `supabase/migrations/*` | Database schema, security policies and functions |
 | `proxy.ts` | Refreshes the login session; sends signed-out visitors from `/admin` to `/login` |
+| `mobile/` | iOS app (see `mobile/README.md`). Shares `lib/types.ts` for API types |

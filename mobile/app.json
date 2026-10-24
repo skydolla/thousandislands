@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "1000 Islands",
+    "slug": "thousandislands",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "thousandislands",
+    "userInterfaceStyle": "dark",
+    "platforms": ["ios"],
+    "ios": {
+      "bundleIdentifier": "com.skydolla.thousandislands",
+      "supportsTablet": false,
+      "config": { "usesNonExemptEncryption": false }
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#09090b",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 160
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Choose trip photos to upload to your island map.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ],
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}
