@@ -1,0 +1,30 @@
+name: Database backup
+
+# Weekly export of the trip data (public schema only: the same data the site already serves
+# publicly; login accounts live in the auth schema and are not included). Supabase's free plan
+# has no backups. Download a dump from the run's Artifacts; restore with:
+#   psql "$SUPABASE_DB_URL" -f thousandislands-<date>.sql
+on:
+  schedule:
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump public schema
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          file="thousandislands-$(date -u +%Y-%m-%d).sql"
+          docker run --rm -e SUPABASE_DB_URL postgres:17-alpine \
+            sh -c 'pg_dump "$SUPABASE_DB_URL" --schema=public --no-owner --no-privileges --clean --if-exists' > "$file"
+          test -s "$file"
+          echo "file=$file" >> "$GITHUB_ENV"
+          echo "Dumped $(grep -c '^COPY ' "$file") tables, $(du -h "$file" | cut -f1)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.file }}
+          path: ${{ env.file }}
+          retention-days: 90
