@@ -1,21 +1,11 @@
-import { NextResponse } from "next/server";
 import { getMapPins } from "@/lib/services/map-pins";
+import { apiError, ok } from "@/lib/api";
 
 export async function GET() {
   try {
-    const pins = getMapPins();
-    return NextResponse.json(
-      { pins },
-      {
-        headers: {
-          "Cache-Control": "public, max-age=600, stale-while-revalidate=300",
-        },
-      }
-    );
-  } catch {
-    return NextResponse.json(
-      { error: { code: "INTERNAL_ERROR", message: "Failed to load map pins." } },
-      { status: 500 }
-    );
+    return ok({ pins: await getMapPins() });
+  } catch (err) {
+    console.error("Failed to load map pins", err);
+    return apiError("INTERNAL_ERROR", "Failed to load map pins.");
   }
 }

@@ -1,33 +1,37 @@
 import type { MapPin } from "@/lib/types";
-import { trips, islands, tripIslands } from "@/lib/data/seed";
+import { createPublicSupabase } from "@/lib/supabase/server";
 
-/**
- * Returns one pin per visited island, listing every trip that visited it.
- *
- * In a production system this would be a SQL query joining trip_islands → trips → islands,
- * grouped by island with the trips aggregated, selecting only the columns needed for rendering.
- */
-export function getMapPins(): MapPin[] {
+export interface MapPinRow {
+  island: {
+    id: string;
+    name: string;
+    country: string;
+    region_or_state: string | null;
+    latitude: number;
+    longitude: number;
+  };
+  trip: { id: string; name: string; start_date: string };
+}
+
+/** Groups trip_island rows into one pin per island, listing its trips most recent first. */
+export function buildMapPins(rows: MapPinRow[]): MapPin[] {
   const pinsByIsland = new Map<string, MapPin>();
 
-  for (const ti of tripIslands) {
-    const trip = trips.find((t) => t.id === ti.tripId)!;
-    const island = islands.find((i) => i.id === ti.islandId)!;
-
+  for (const { island, trip } of rows) {
     let pin = pinsByIsland.get(island.id);
     if (!pin) {
       pin = {
         islandId: island.id,
         islandName: island.name,
         country: island.country,
-        regionOrState: island.regionOrState,
+        regionOrState: island.region_or_state,
         latitude: island.latitude,
         longitude: island.longitude,
         trips: [],
       };
       pinsByIsland.set(island.id, pin);
     }
-    pin.trips.push({ tripId: trip.id, tripName: trip.name, startDate: trip.startDate });
+    pin.trips.push({ tripId: trip.id, tripName: trip.name, startDate: trip.start_date });
   }
 
   const pins = [...pinsByIsland.values()];
@@ -35,4 +39,16 @@ export function getMapPins(): MapPin[] {
     pin.trips.sort((a, b) => b.startDate.localeCompare(a.startDate));
   }
   return pins;
+}
+
+/** Returns one pin per visited island with the minimal data needed to render the map. */
+export async function getMapPins(): Promise<MapPin[]> {
+  const { data, error } = await createPublicSupabase()
+    .from("trip_islands")
+    .select(
+      "island:islands!inner(id, name, country, region_or_state, latitude, longitude), trip:trips!inner(id, name, start_date)"
+    )
+    .returns<MapPinRow[]>();
+  if (error) throw error;
+  return buildMapPins(data);
 }

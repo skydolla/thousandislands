@@ -21,3 +21,20 @@ body {
   font-size: 10px;
   opacity: 0.5;
 }
+
+/* Shared form controls for the login and admin pages. */
+@utility input {
+  @apply w-full rounded-lg bg-zinc-800 border border-zinc-700 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/60 focus:border-transparent;
+}
+@utility btn-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors;
+}
+@utility btn-secondary {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-200 hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors;
+}
+@utility btn-danger {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-red-400 hover:bg-red-500/10 disabled:opacity-50 transition-colors;
+}
+@utility label {
+  @apply text-xs font-semibold uppercase tracking-wider text-zinc-500;
+}
