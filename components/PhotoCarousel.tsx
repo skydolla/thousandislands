@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { TripDetailIslandPicture } from "@/lib/types";
 import { cn } from "@/lib/cn";
@@ -9,8 +9,15 @@ interface PhotoCarouselProps {
   pictures: TripDetailIslandPicture[];
 }
 
+const SWIPE_THRESHOLD_PX = 40;
+
+/**
+ * Callers should pass a `key` that changes with the picture set (e.g. the trip island id)
+ * so the current index resets when switching islands.
+ */
 export default function PhotoCarousel({ pictures }: PhotoCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const touchStartX = useRef<number | null>(null);
 
   if (pictures.length === 0) {
     return (
@@ -20,7 +27,7 @@ export default function PhotoCarousel({ pictures }: PhotoCarouselProps) {
     );
   }
 
-  const current = pictures[currentIndex];
+  const current = pictures[Math.min(currentIndex, pictures.length - 1)];
 
   const goTo = (index: number) => {
     if (index < 0) setCurrentIndex(pictures.length - 1);
@@ -30,7 +37,19 @@ export default function PhotoCarousel({ pictures }: PhotoCarouselProps) {
 
   return (
     <div className="space-y-3">
-      <div className="relative group">
+      <div
+        className="relative group"
+        onTouchStart={(e) => {
+          touchStartX.current = e.touches[0].clientX;
+        }}
+        onTouchEnd={(e) => {
+          if (touchStartX.current === null || pictures.length <= 1) return;
+          const dx = e.changedTouches[0].clientX - touchStartX.current;
+          touchStartX.current = null;
+          if (dx <= -SWIPE_THRESHOLD_PX) goTo(currentIndex + 1);
+          else if (dx >= SWIPE_THRESHOLD_PX) goTo(currentIndex - 1);
+        }}
+      >
         <div className="aspect-[4/3] w-full overflow-hidden rounded-lg bg-zinc-800">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -45,14 +64,14 @@ export default function PhotoCarousel({ pictures }: PhotoCarouselProps) {
           <>
             <button
               onClick={() => goTo(currentIndex - 1)}
-              className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/60 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80"
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/60 flex items-center justify-center text-white pointer-fine:opacity-0 pointer-fine:group-hover:opacity-100 transition-opacity hover:bg-black/80"
               aria-label="Previous photo"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               onClick={() => goTo(currentIndex + 1)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/60 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80"
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/60 flex items-center justify-center text-white pointer-fine:opacity-0 pointer-fine:group-hover:opacity-100 transition-opacity hover:bg-black/80"
               aria-label="Next photo"
             >
               <ChevronRight className="w-5 h-5" />

@@ -10,6 +10,11 @@ const geistSans = Geist({
 export const metadata: Metadata = {
   title: "1000 Islands",
   description: "Track progress toward visiting 1,000 islands around the world.",
+  openGraph: {
+    title: "1000 Islands",
+    description: "Track progress toward visiting 1,000 islands around the world.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
