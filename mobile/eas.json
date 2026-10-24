@@ -7,7 +7,9 @@
     "production": {
       "autoIncrement": true,
       "channel": "production",
-      "ios": { "resourceClass": "medium" }
+      "ios": {
+        "resourceClass": "medium"
+      }
     }
   },
   "submit": {

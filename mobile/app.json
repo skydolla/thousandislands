@@ -7,11 +7,18 @@
     "icon": "./assets/images/icon.png",
     "scheme": "thousandislands",
     "userInterfaceStyle": "dark",
-    "platforms": ["ios"],
+    "platforms": [
+      "ios"
+    ],
     "ios": {
       "bundleIdentifier": "com.skydolla.thousandislands",
       "supportsTablet": false,
-      "config": { "usesNonExemptEncryption": false }
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
     },
     "plugins": [
       "expo-router",
@@ -36,6 +43,15 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "15c24789-ecc3-40ba-a0ef-3bcadf1752c6"
+      }
+    },
+    "owner": "skydolla",
+    "updates": {
+      "url": "https://u.expo.dev/15c24789-ecc3-40ba-a0ef-3bcadf1752c6"
     }
   }
 }
