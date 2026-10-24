@@ -26,6 +26,17 @@ npm run create-owner         # creates your login (prompts for email and passwor
 npm run dev                  # http://localhost:3000 — edit trips at /admin
 ```
 
+## Deployment
+
+- **Web:** Vercel deploys `main` to production and every pull request to a preview URL.
+  Environment variables are set in the Vercel project (everything in `.env.example` except `SUPABASE_DB_URL`).
+- **Keep-alive:** Vercel Cron calls `/api/health` daily (`vercel.json`), because Supabase's free plan
+  pauses projects after a week without activity.
+- **CI:** `.github/workflows/ci.yml` runs lint, type-check, tests and build on every PR.
+- **Backups:** `.github/workflows/backup.yml` exports the trip data weekly (Mondays) as a downloadable
+  artifact kept 90 days. Needs the `SUPABASE_DB_URL` repository secret. Run it manually from
+  Actions → Database backup → Run workflow.
+
 ## Scripts
 
 | Command | What |
@@ -47,6 +58,7 @@ Reads are public; writes need the owner's session cookie (web) or `Authorization
 |---|---|
 | `/api/map-pins` | `GET` one pin per visited island |
 | `/api/progress` | `GET` unique islands visited / goal |
+| `/api/health` | `GET` database check (daily cron keep-alive) |
 | `/api/trips` | `GET` list, `POST` create |
 | `/api/trips/[tripId]` | `GET` detail, `PUT` replace, `DELETE` |
 | `/api/islands` | `GET ?q=` search, `POST` create |
