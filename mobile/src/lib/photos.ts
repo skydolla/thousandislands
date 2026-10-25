@@ -17,8 +17,12 @@ export async function pickPhotos(options?: { multiple?: boolean }): Promise<Imag
     allowsMultipleSelection: multiple,
     selectionLimit: multiple ? 30 : 1,
     exif: true,
-    // Hands back JPEG instead of HEIC, so every photo can be resized the same way.
-    preferredAssetRepresentationMode: ImagePicker.UIImagePickerPreferredAssetRepresentationMode.Compatible,
+    // Copy the original file (often HEIC) rather than asking iOS to convert it: conversion fails for
+    // some photos, e.g. ones kept in iCloud. uploadPhoto re-encodes everything as JPEG anyway.
+    quality: 1,
+    preferredAssetRepresentationMode: ImagePicker.UIImagePickerPreferredAssetRepresentationMode.Current,
+  }).catch((err: Error) => {
+    throw new Error(`Couldn't open those photos. ${err.message}`);
   });
   return result.canceled ? [] : result.assets;
 }
