@@ -72,6 +72,8 @@ export function NewIslandScreen({ initialName }: { initialName: string }) {
       const location = photoLocation(asset);
       if (location) place(location);
       else setError("That photo has no location saved in it. Try another, or tap the map.");
+    } catch (err) {
+      setError((err as Error).message);
     } finally {
       setBusy(null);
     }

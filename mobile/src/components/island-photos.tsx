@@ -29,7 +29,13 @@ export function IslandPhotos({
 
   async function add() {
     setError(null);
-    const assets = await pickPhotos();
+    let assets;
+    try {
+      assets = await pickPhotos();
+    } catch (err) {
+      setError((err as Error).message);
+      return;
+    }
     if (assets.length === 0) return;
     const failures: string[] = [];
     setUploading({ done: 0, total: assets.length });
