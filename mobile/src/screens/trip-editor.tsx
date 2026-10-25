@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { router, Stack, useFocusEffect, useNavigation } from "expo-router";
 import { usePreventRemove } from "expo-router/react-navigation";
@@ -90,8 +90,11 @@ export function TripEditorScreen({ tripId }: { tripId?: string }) {
 function TripForm({ tripId, trip, onSaved }: { tripId?: string; trip?: Trip; onSaved: () => Promise<void> }) {
   const queryClient = useQueryClient();
   const navigation = useNavigation();
-  /** Set when leaving on purpose (after creating or deleting), so the discard prompt is skipped. */
-  const leaving = useRef(false);
+  /**
+   * Navigation to run when leaving on purpose (after creating or deleting). It runs only after the
+   * unsaved-changes guard has been switched off, so the guard can't intercept it.
+   */
+  const [exit, setExit] = useState<(() => void) | null>(null);
   const [saved, setSaved] = useState(() => draftFrom(trip));
   const [draft, setDraft] = useState(saved);
   const [saving, setSaving] = useState(false);
@@ -112,13 +115,15 @@ function TripForm({ tripId, trip, onSaved }: { tripId?: string; trip?: Trip; onS
     }, [])
   );
 
-  usePreventRemove(dirty && !saving, ({ data }) => {
-    if (leaving.current) return navigation.dispatch(data.action);
+  usePreventRemove(dirty && !saving && !exit, ({ data }) => {
     Alert.alert("Discard changes?", "Your changes to this trip haven't been saved.", [
       { text: "Keep editing", style: "cancel" },
       { text: "Discard", style: "destructive", onPress: () => navigation.dispatch(data.action) },
     ]);
   });
+
+  // Declared after the guard so it sees the guard already switched off.
+  useEffect(() => exit?.(), [exit]);
 
   async function save() {
     const payload = payloadOf(draft);
@@ -136,9 +141,8 @@ function TripForm({ tripId, trip, onSaved }: { tripId?: string; trip?: Trip; onS
         await onSaved();
       } else {
         const { id } = await apiFetch<{ id: string }>("/api/trips", { method: "POST", json: payload });
-        leaving.current = true;
         invalidateAll(queryClient);
-        router.replace({ pathname: "/manage/[tripId]", params: { tripId: id } });
+        setExit(() => () => router.replace({ pathname: "/manage/[tripId]", params: { tripId: id } }));
       }
     } catch (err) {
       setError((err as Error).message);
@@ -180,8 +184,7 @@ function TripForm({ tripId, trip, onSaved }: { tripId?: string; trip?: Trip; onS
             await apiFetch(`/api/trips/${tripId}`, { method: "DELETE" });
             queryClient.removeQueries({ queryKey: ["trip", tripId] });
             invalidateAll(queryClient);
-            leaving.current = true;
-            router.back();
+            setExit(() => () => router.back());
           } catch (err) {
             setError((err as Error).message);
           }
