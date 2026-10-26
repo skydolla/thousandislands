@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { X, MapPin, Calendar, Globe, Mountain } from "lucide-react";
+import Link from "next/link";
+import { X, MapPin, Calendar, Globe, Mountain, Pencil } from "lucide-react";
 import type { MapPinTrip, TripDetailResponse } from "@/lib/types";
 import { cn } from "@/lib/cn";
+import { createBrowserSupabase } from "@/lib/supabase/browser";
 import PhotoCarousel from "./PhotoCarousel";
 import IslandSwitcher from "./IslandSwitcher";
 
@@ -40,6 +42,14 @@ export default function TripModal({ islandId, trips, onClose }: TripModalProps) 
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const onCloseRef = useRef(onClose);
+  // Sign-ups are disabled, so a signed-in visitor is the owner.
+  const [signedIn, setSignedIn] = useState(false);
+
+  useEffect(() => {
+    createBrowserSupabase()
+      .auth.getSession()
+      .then(({ data }) => setSignedIn(!!data.session));
+  }, []);
 
   useEffect(() => {
     onCloseRef.current = onClose;
@@ -232,9 +242,19 @@ export default function TripModal({ islandId, trips, onClose }: TripModalProps) 
             {/* Photos for selected island */}
             {selectedTripIsland && (
               <div className="space-y-3">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                  Photos — {selectedTripIsland.island.name}
-                </h3>
+                <div className="flex items-center justify-between gap-4">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                    Photos — {selectedTripIsland.island.name}
+                  </h3>
+                  {signedIn && (
+                    <Link
+                      href={`/admin/islands/${selectedTripIsland.island.id}`}
+                      className="flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300"
+                    >
+                      <Pencil className="w-3.5 h-3.5" /> Edit island
+                    </Link>
+                  )}
+                </div>
                 <PhotoCarousel
                   key={selectedTripIsland.tripIslandId}
                   pictures={selectedTripIsland.pictures}

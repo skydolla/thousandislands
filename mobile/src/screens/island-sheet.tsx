@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import { router } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import { Chip } from "@/components/chip";
 import { PhotoPager } from "@/components/photo-pager";
+import { useSession } from "@/hooks/use-session";
 import { formatDateRange, plural } from "@/lib/format";
 import { useMapPins, useTrip } from "@/lib/queries";
 import { colors } from "@/lib/theme";
@@ -29,6 +31,7 @@ function SectionTitle({ children }: { children: string }) {
 /** The sheet shown when a pin is tapped: each trip that visited the island, with its photos. */
 export function IslandSheet({ islandId }: { islandId: string }) {
   const pins = useMapPins();
+  const { session } = useSession();
   const pin = pins.data?.find((p) => p.islandId === islandId);
   const [tripId, setTripId] = useState<string>();
   const [selectedIslandId, setSelectedIslandId] = useState(islandId);
@@ -101,7 +104,22 @@ export function IslandSheet({ islandId }: { islandId: string }) {
 
         {selected && (
           <View style={{ gap: 10 }}>
-            <SectionTitle>{`Photos — ${selected.island.name}`}</SectionTitle>
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+              <SectionTitle>{`Photos — ${selected.island.name}`}</SectionTitle>
+              {session && (
+                <Pressable
+                  accessibilityRole="button"
+                  hitSlop={8}
+                  onPress={() =>
+                    router.push({ pathname: "/manage/islands/[islandId]", params: { islandId: selected.island.id } })
+                  }
+                  style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 5, opacity: pressed ? 0.6 : 1 })}
+                >
+                  <SymbolView name="pencil" size={13} tintColor={colors.accent} />
+                  <Text style={{ color: colors.accent, fontSize: 14 }}>Edit island</Text>
+                </Pressable>
+              )}
+            </View>
             <PhotoPager key={selected.tripIslandId} pictures={selected.pictures} />
           </View>
         )}
