@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowDown, ArrowUp, X } from "lucide-react";
+import { ArrowDown, ArrowUp, Pencil, X } from "lucide-react";
 import type { Island, TripDetailIsland, TripDetailResponse } from "@/lib/types";
 import { apiFetch } from "@/lib/client-api";
+import IslandForm from "./IslandForm";
 import IslandPicker from "./IslandPicker";
 import PhotoManager from "./PhotoManager";
 
@@ -32,6 +33,8 @@ export default function TripEditor({ tripId }: TripEditorProps) {
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<Date | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
+  /** The island being edited in a dialog, loaded in full (the trip only carries its summary). */
+  const [editingIsland, setEditingIsland] = useState<Island | null>(null);
 
   useEffect(() => {
     if (!tripId) return;
@@ -65,6 +68,16 @@ export default function TripEditor({ tripId }: TripEditorProps) {
       return;
     }
     setIslands(islands.filter((_, i) => i !== index));
+  }
+
+  async function editIsland(id: string) {
+    setError(null);
+    try {
+      const { island } = await apiFetch<{ island: Island }>(`/api/islands/${id}`);
+      setEditingIsland(island);
+    } catch (err) {
+      setError((err as Error).message);
+    }
   }
 
   async function save(e: React.FormEvent) {
@@ -180,6 +193,9 @@ export default function TripEditor({ tripId }: TripEditorProps) {
                     </span>
                     {!item.saved && <span className="ml-2 text-xs text-amber-400">unsaved</span>}
                   </div>
+                  <button type="button" onClick={() => editIsland(item.island.id)} aria-label={`Edit ${item.island.name}`} className="text-zinc-500 hover:text-white">
+                    <Pencil className="w-4 h-4" />
+                  </button>
                   <button type="button" onClick={() => moveIsland(index, -1)} disabled={index === 0} aria-label={`Move ${item.island.name} up`} className="text-zinc-500 hover:text-white disabled:opacity-30">
                     <ArrowUp className="w-4 h-4" />
                   </button>
@@ -192,6 +208,16 @@ export default function TripEditor({ tripId }: TripEditorProps) {
                 </li>
               ))}
             </ol>
+          )}
+          {editingIsland && (
+            <IslandForm
+              island={editingIsland}
+              onCancel={() => setEditingIsland(null)}
+              onSaved={(saved) => {
+                setEditingIsland(null);
+                setIslands((prev) => prev.map((i) => (i.island.id === saved.id ? { ...i, island: saved } : i)));
+              }}
+            />
           )}
           <IslandPicker
             excludeIds={islands.map((i) => i.island.id)}

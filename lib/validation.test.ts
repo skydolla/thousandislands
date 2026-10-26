@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { pictureCreateSchema, tripInputSchema, uploadRequestSchema } from "@/lib/validation";
+import {
+  islandInputSchema,
+  islandMergeSchema,
+  pictureCreateSchema,
+  tripInputSchema,
+  uploadRequestSchema,
+} from "@/lib/validation";
 
 const ISLAND_A = "1b4e28ba-2fa1-41d2-883f-0016d3cca427";
 const ISLAND_B = "6ec0bd7f-11c0-43da-975e-2a8ad9ebae0b";
@@ -54,5 +60,22 @@ describe("uploads", () => {
     expect(
       pictureCreateSchema.safeParse({ ...base, storageKey: "../secrets.jpg" }).success
     ).toBe(false);
+  });
+});
+
+describe("islands", () => {
+  const island = { name: "Bequia", country: "Saint Vincent and the Grenadines", regionOrState: null, latitude: 13, longitude: -61.2 };
+
+  it("leaves notes out when they aren't sent, so an edit keeps existing notes", () => {
+    expect(islandInputSchema.parse(island)).not.toHaveProperty("notes");
+  });
+
+  it("rejects coordinates off the globe", () => {
+    expect(islandInputSchema.safeParse({ ...island, latitude: 91 }).success).toBe(false);
+  });
+
+  it("requires a real island id to merge", () => {
+    expect(islandMergeSchema.safeParse({ duplicateId: ISLAND_A }).success).toBe(true);
+    expect(islandMergeSchema.safeParse({ duplicateId: "isl-001" }).success).toBe(false);
   });
 });
