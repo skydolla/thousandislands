@@ -128,6 +128,17 @@ export interface TripSummary {
   islandCount: number;
 }
 
+/** An island in the owner's island list, with how many trips visited it. */
+export interface IslandSummary extends Island {
+  tripCount: number;
+}
+
+export interface IslandDetailResponse {
+  island: Island;
+  /** Trips that visited the island, most recent first. */
+  trips: Pick<TripSummary, "id" | "name" | "startDate" | "endDate">[];
+}
+
 export interface ProgressResponse {
   uniqueIslandsVisited: number;
   goal: number;

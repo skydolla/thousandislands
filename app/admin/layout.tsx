@@ -22,6 +22,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <Link href="/admin" className="font-semibold text-white">
               1000 Islands <span className="text-zinc-500 font-normal">· Admin</span>
             </Link>
+            <Link href="/admin" className="text-zinc-400 hover:text-white">
+              Trips
+            </Link>
+            <Link href="/admin/islands" className="text-zinc-400 hover:text-white">
+              Islands
+            </Link>
             <Link href="/" className="text-zinc-400 hover:text-white">
               View map
             </Link>

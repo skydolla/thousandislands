@@ -1,8 +1,8 @@
 import { requireOwner } from "@/lib/auth";
-import { fromDbError, ok, parseBody } from "@/lib/api";
+import { apiError, fromDbError, ok, parseBody } from "@/lib/api";
 import { createPublicSupabase } from "@/lib/supabase/server";
 import { islandInputSchema } from "@/lib/validation";
-import type { Island } from "@/lib/types";
+import type { Island, IslandSummary } from "@/lib/types";
 
 export interface IslandRow {
   id: string;
@@ -30,18 +30,34 @@ export function toIsland(row: IslandRow): Island {
   };
 }
 
-/** Lists islands by name, optionally filtered with ?q= (matches name or country). */
+/** The unique index on (lower(name), country) turns into this message. */
+export function duplicateIslandError(name: string, country: string) {
+  return apiError("CONFLICT", `There's already an island called ${name} in ${country}.`);
+}
+
+/**
+ * Lists islands by name with how many trips visited each, optionally filtered with ?q=
+ * (matches name or country).
+ */
 export async function GET(request: Request) {
   const q = new URL(request.url).searchParams.get("q")?.trim();
-  let query = createPublicSupabase().from("islands").select("*").order("name").limit(q ? 20 : 1000);
+  let query = createPublicSupabase()
+    .from("islands")
+    .select("*, trip_islands(count)")
+    .order("name")
+    .limit(q ? 20 : 5000);
   if (q) {
     // Escape PostgREST filter syntax characters and LIKE wildcards in the search term.
     const term = q.replace(/[%_\\]/g, "\\$&").replace(/[,()]/g, " ");
     query = query.or(`name.ilike.%${term}%,country.ilike.%${term}%`);
   }
-  const { data, error } = await query.returns<IslandRow[]>();
+  const { data, error } = await query.returns<(IslandRow & { trip_islands: { count: number }[] })[]>();
   if (error) return fromDbError(error, "Failed to load islands.");
-  return ok({ islands: data.map(toIsland) });
+  const islands: IslandSummary[] = data.map((row) => ({
+    ...toIsland(row),
+    tripCount: row.trip_islands[0]?.count ?? 0,
+  }));
+  return ok({ islands });
 }
 
 export async function POST(request: Request) {
@@ -63,6 +79,7 @@ export async function POST(request: Request) {
     })
     .select("*")
     .single<IslandRow>();
+  if (error?.code === "23505") return duplicateIslandError(i.name, i.country);
   if (error) return fromDbError(error, "Failed to create island.");
   return ok({ island: toIsland(data) }, 201);
 }

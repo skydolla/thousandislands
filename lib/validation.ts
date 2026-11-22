@@ -27,9 +27,12 @@ export const islandInputSchema = z.object({
   regionOrState: z.string().trim().max(100).nullable(),
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
-  notes: z.string().trim().max(2000).nullable(),
+  /** Optional: leaving it out on an update keeps the existing notes. */
+  notes: z.string().trim().max(2000).nullable().optional(),
 });
 export type IslandInput = z.infer<typeof islandInputSchema>;
+
+export const islandMergeSchema = z.object({ duplicateId: z.uuid() });
 
 export const uploadRequestSchema = z.object({
   tripIslandId: z.uuid(),

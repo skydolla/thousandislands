@@ -1,0 +1,185 @@
+import { useRef, useState } from "react";
+import { ActivityIndicator, Text, View } from "react-native";
+import MapView, { Marker } from "react-native-maps";
+import { Stack } from "expo-router";
+import type { Island } from "@shared/types";
+import { ActionRow, ErrorText, Field, Section } from "@/components/form";
+import { HeaderButton } from "@/components/header-button";
+import { apiFetch } from "@/lib/api";
+import { photoLocation, pickPhotos } from "@/lib/photos";
+import { colors } from "@/lib/theme";
+
+interface NominatimResult {
+  lat: string;
+  lon: string;
+  address?: { country?: string; state?: string; region?: string; archipelago?: string };
+}
+
+type Coordinate = { latitude: number; longitude: number };
+
+const round = (n: number) => Math.round(n * 1e5) / 1e5;
+
+/**
+ * Adds or edits an island: name, country, region and a pin on the map. Renders the form sections and
+ * the screen's header buttons; the screen supplies the scroll view.
+ */
+export function IslandForm({
+  island,
+  initialName = "",
+  onSaved,
+  onCancel,
+}: {
+  /** The island to edit. Omit to add a new one. */
+  island?: Island;
+  initialName?: string;
+  onSaved: (island: Island) => void;
+  /** Shows a Cancel button in the header (for modal screens). */
+  onCancel?: () => void;
+}) {
+  const [name, setName] = useState(island?.name ?? initialName);
+  const [country, setCountry] = useState(island?.country ?? "");
+  const [regionOrState, setRegionOrState] = useState(island?.regionOrState ?? "");
+  const [position, setPosition] = useState<Coordinate | null>(
+    island ? { latitude: island.latitude, longitude: island.longitude } : null
+  );
+  const [busy, setBusy] = useState<"lookup" | "photo" | "save" | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const mapRef = useRef<MapView>(null);
+
+  function place(c: Coordinate, zoom = true) {
+    const rounded = { latitude: round(c.latitude), longitude: round(c.longitude) };
+    setPosition(rounded);
+    if (zoom) mapRef.current?.animateToRegion({ ...rounded, latitudeDelta: 0.6, longitudeDelta: 0.6 }, 400);
+  }
+
+  // OpenStreetMap's free geocoder. Its usage policy allows occasional lookups like this button,
+  // not search-as-you-type, and asks apps to identify themselves.
+  async function lookUp() {
+    setBusy("lookup");
+    setError(null);
+    try {
+      const q = [name, regionOrState, country].filter(Boolean).join(", ");
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=1&accept-language=en&q=${encodeURIComponent(q)}`,
+        { headers: { "User-Agent": "ThousandIslands-iOS/1.0 (github.com/skydolla/thousandislands)" } }
+      );
+      const [hit] = (await res.json()) as NominatimResult[];
+      if (!hit) {
+        setError("No match found. Tap the map to place the island instead.");
+        return;
+      }
+      place({ latitude: Number(hit.lat), longitude: Number(hit.lon) });
+      if (!country && hit.address?.country) setCountry(hit.address.country);
+      const region = hit.address?.state ?? hit.address?.region ?? hit.address?.archipelago;
+      if (!regionOrState && region) setRegionOrState(region);
+    } catch {
+      setError("Lookup failed. Tap the map to place the island instead.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function fromPhoto() {
+    setError(null);
+    setBusy("photo");
+    try {
+      const [asset] = await pickPhotos({ multiple: false });
+      if (!asset) return;
+      const location = photoLocation(asset);
+      if (location) place(location);
+      else setError("That photo has no location saved in it. Try another, or tap the map.");
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function save() {
+    if (!name.trim() || !country.trim()) {
+      setError("Name and country are required.");
+      return;
+    }
+    if (!position) {
+      setError("Place the island on the map: tap it, use Look up, or use a photo's location.");
+      return;
+    }
+    setBusy("save");
+    setError(null);
+    try {
+      const { island: saved } = await apiFetch<{ island: Island }>(
+        island ? `/api/islands/${island.id}` : "/api/islands",
+        {
+          method: island ? "PUT" : "POST",
+          json: { name, country, regionOrState: regionOrState.trim() || null, ...position },
+        }
+      );
+      setBusy(null);
+      onSaved(saved);
+    } catch (err) {
+      setError((err as Error).message);
+      setBusy(null);
+    }
+  }
+
+  return (
+    <>
+      <Stack.Screen
+        options={{
+          ...(onCancel && { headerLeft: () => <HeaderButton label="Cancel" onPress={onCancel} /> }),
+          headerRight: () =>
+            busy === "save" ? (
+              <ActivityIndicator />
+            ) : (
+              <HeaderButton label={island ? "Save" : "Add"} bold onPress={save} disabled={!!busy} />
+            ),
+        }}
+      />
+
+      <Section>
+        <Field label="Name" value={name} onChangeText={setName} placeholder="Required" autoCapitalize="words" />
+        <Field label="Country" value={country} onChangeText={setCountry} placeholder="Required" autoCapitalize="words" />
+        <Field label="Region" value={regionOrState} onChangeText={setRegionOrState} placeholder="Optional" autoCapitalize="words" />
+      </Section>
+
+      <Section
+        title="Location"
+        footer={
+          <Text selectable style={{ color: colors.secondaryLabel, fontSize: 13, fontVariant: ["tabular-nums"] }}>
+            {position
+              ? `${position.latitude}, ${position.longitude} · tap or drag to adjust`
+              : "Tap the map to drop a pin."}
+          </Text>
+        }
+      >
+        <ActionRow label="Look up by name" onPress={lookUp} busy={busy === "lookup"} disabled={!name.trim() || !!busy} />
+        <ActionRow label="Use a photo's location" onPress={fromPhoto} busy={busy === "photo"} disabled={!!busy} />
+        <View style={{ height: 260 }}>
+          <MapView
+            ref={mapRef}
+            style={{ flex: 1 }}
+            initialRegion={
+              position
+                ? { ...position, latitudeDelta: 0.6, longitudeDelta: 0.6 }
+                : { latitude: 20, longitude: 0, latitudeDelta: 120, longitudeDelta: 180 }
+            }
+            mapType="mutedStandard"
+            userInterfaceStyle="dark"
+            onPress={(e) => place(e.nativeEvent.coordinate, false)}
+          >
+            {position && (
+              <Marker
+                coordinate={position}
+                pinColor={colors.accent}
+                draggable
+                onDragEnd={(e) => place(e.nativeEvent.coordinate, false)}
+              />
+            )}
+          </MapView>
+        </View>
+      </Section>
+
+      <ErrorText>{error}</ErrorText>
+    </>
+  );
+}

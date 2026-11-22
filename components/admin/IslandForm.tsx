@@ -10,9 +10,14 @@ import { apiFetch } from "@/lib/client-api";
 const LocationPicker = dynamic(() => import("./LocationPicker"), { ssr: false });
 
 interface IslandFormProps {
-  initialName: string;
-  onCreated: (island: Island) => void;
+  /** The island to edit. Omit to create a new one. */
+  island?: Island;
+  /** Prefills the name of a new island. */
+  initialName?: string;
+  onSaved: (island: Island) => void;
   onCancel: () => void;
+  /** "dialog" floats over the page (used inside the trip form); "page" renders inline. */
+  layout?: "dialog" | "page";
 }
 
 interface NominatimResult {
@@ -21,13 +26,13 @@ interface NominatimResult {
   address?: { country?: string; state?: string; region?: string; archipelago?: string };
 }
 
-/** Dialog for adding a new island: name, country, region and a pin placed on a map. */
-export default function IslandForm({ initialName, onCreated, onCancel }: IslandFormProps) {
-  const [name, setName] = useState(initialName);
-  const [country, setCountry] = useState("");
-  const [regionOrState, setRegionOrState] = useState("");
-  const [latitude, setLatitude] = useState<number | null>(null);
-  const [longitude, setLongitude] = useState<number | null>(null);
+/** Adds or edits an island: name, country, region and a pin placed on a map. */
+export default function IslandForm({ island, initialName = "", onSaved, onCancel, layout = "dialog" }: IslandFormProps) {
+  const [name, setName] = useState(island?.name ?? initialName);
+  const [country, setCountry] = useState(island?.country ?? "");
+  const [regionOrState, setRegionOrState] = useState(island?.regionOrState ?? "");
+  const [latitude, setLatitude] = useState<number | null>(island?.latitude ?? null);
+  const [longitude, setLongitude] = useState<number | null>(island?.longitude ?? null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [lookingUp, setLookingUp] = useState(false);
@@ -70,15 +75,101 @@ export default function IslandForm({ initialName, onCreated, onCancel }: IslandF
     setSaving(true);
     setError(null);
     try {
-      const { island } = await apiFetch<{ island: Island }>("/api/islands", {
-        method: "POST",
-        json: { name, country, regionOrState: regionOrState || null, latitude, longitude, notes: null },
-      });
-      onCreated(island);
+      const json = { name, country, regionOrState: regionOrState || null, latitude, longitude };
+      const { island: saved } = await apiFetch<{ island: Island }>(
+        island ? `/api/islands/${island.id}` : "/api/islands",
+        { method: island ? "PUT" : "POST", json }
+      );
+      setSaving(false);
+      onSaved(saved);
     } catch (err) {
       setError((err as Error).message);
       setSaving(false);
     }
+  }
+
+  const fields = (
+    <>
+      <label className="block space-y-1.5">
+        <span className="label">Name</span>
+        <input required value={name} onChange={(e) => setName(e.target.value)} className="input" />
+      </label>
+      <div className="grid grid-cols-2 gap-3">
+        <label className="block space-y-1.5">
+          <span className="label">Country</span>
+          <input required value={country} onChange={(e) => setCountry(e.target.value)} className="input" />
+        </label>
+        <label className="block space-y-1.5">
+          <span className="label">Region / state</span>
+          <input
+            value={regionOrState}
+            onChange={(e) => setRegionOrState(e.target.value)}
+            placeholder="Optional"
+            className="input"
+          />
+        </label>
+      </div>
+
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="label">Location</span>
+          <button type="button" onClick={lookUp} disabled={!name || lookingUp} className="btn-secondary !py-1 !px-2.5 text-xs">
+            <Search className="w-3.5 h-3.5" /> {lookingUp ? "Looking up…" : "Look up"}
+          </button>
+        </div>
+        <LocationPicker
+          latitude={latitude}
+          longitude={longitude}
+          onChange={(lat, lng) => {
+            setLatitude(lat);
+            setLongitude(lng);
+          }}
+        />
+        <div className="grid grid-cols-2 gap-3">
+          <input
+            type="number"
+            step="any"
+            min={-90}
+            max={90}
+            aria-label="Latitude"
+            placeholder="Latitude"
+            value={latitude ?? ""}
+            onChange={(e) => setLatitude(e.target.value === "" ? null : Number(e.target.value))}
+            className="input"
+          />
+          <input
+            type="number"
+            step="any"
+            min={-180}
+            max={180}
+            aria-label="Longitude"
+            placeholder="Longitude"
+            value={longitude ?? ""}
+            onChange={(e) => setLongitude(e.target.value === "" ? null : Number(e.target.value))}
+            className="input"
+          />
+        </div>
+      </div>
+
+      {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
+
+      <div className="flex justify-end gap-2 pt-2">
+        <button type="button" onClick={onCancel} className="btn-secondary">
+          Cancel
+        </button>
+        <button type="submit" disabled={saving} className="btn-primary">
+          {saving ? "Saving…" : island ? "Save changes" : "Add island"}
+        </button>
+      </div>
+    </>
+  );
+
+  if (layout === "page") {
+    return (
+      <form onSubmit={save} className="space-y-4">
+        {fields}
+      </form>
+    );
   }
 
   // Portaled to <body>: this form is opened from inside the trip form, and forms can't nest.
@@ -94,84 +185,13 @@ export default function IslandForm({ initialName, onCreated, onCancel }: IslandF
       >
         <div className="flex items-center justify-between">
           <h2 id="island-form-title" className="text-lg font-bold text-white">
-            New island
+            {island ? `Edit ${island.name}` : "New island"}
           </h2>
           <button type="button" onClick={onCancel} aria-label="Cancel" className="text-zinc-400 hover:text-white">
             <X className="w-5 h-5" />
           </button>
         </div>
-
-        <label className="block space-y-1.5">
-          <span className="label">Name</span>
-          <input required value={name} onChange={(e) => setName(e.target.value)} className="input" />
-        </label>
-        <div className="grid grid-cols-2 gap-3">
-          <label className="block space-y-1.5">
-            <span className="label">Country</span>
-            <input required value={country} onChange={(e) => setCountry(e.target.value)} className="input" />
-          </label>
-          <label className="block space-y-1.5">
-            <span className="label">Region / state</span>
-            <input
-              value={regionOrState}
-              onChange={(e) => setRegionOrState(e.target.value)}
-              placeholder="Optional"
-              className="input"
-            />
-          </label>
-        </div>
-
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="label">Location</span>
-            <button type="button" onClick={lookUp} disabled={!name || lookingUp} className="btn-secondary !py-1 !px-2.5 text-xs">
-              <Search className="w-3.5 h-3.5" /> {lookingUp ? "Looking up…" : "Look up"}
-            </button>
-          </div>
-          <LocationPicker
-            latitude={latitude}
-            longitude={longitude}
-            onChange={(lat, lng) => {
-              setLatitude(lat);
-              setLongitude(lng);
-            }}
-          />
-          <div className="grid grid-cols-2 gap-3">
-            <input
-              type="number"
-              step="any"
-              min={-90}
-              max={90}
-              aria-label="Latitude"
-              placeholder="Latitude"
-              value={latitude ?? ""}
-              onChange={(e) => setLatitude(e.target.value === "" ? null : Number(e.target.value))}
-              className="input"
-            />
-            <input
-              type="number"
-              step="any"
-              min={-180}
-              max={180}
-              aria-label="Longitude"
-              placeholder="Longitude"
-              value={longitude ?? ""}
-              onChange={(e) => setLongitude(e.target.value === "" ? null : Number(e.target.value))}
-              className="input"
-            />
-          </div>
-        </div>
-
-        {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
-
-        <div className="flex justify-end gap-2 pt-2">
-          <button type="button" onClick={onCancel} className="btn-secondary">
-            Cancel
-          </button>
-          <button type="submit" disabled={saving} className="btn-primary">
-            {saving ? "Saving…" : "Add island"}
-          </button>
-        </div>
+        {fields}
       </form>
     </div>,
     document.body

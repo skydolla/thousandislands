@@ -89,7 +89,7 @@ export default function IslandPicker({ excludeIds, onSelect }: IslandPickerProps
         <IslandForm
           initialName={q}
           onCancel={() => setCreating(false)}
-          onCreated={(island) => {
+          onSaved={(island) => {
             setCreating(false);
             choose(island);
           }}

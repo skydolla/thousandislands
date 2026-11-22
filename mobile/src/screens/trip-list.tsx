@@ -50,11 +50,16 @@ export function TripList() {
         contentContainerStyle={{ padding: 16, gap: 10 }}
         refreshControl={<RefreshControl refreshing={trips.isRefetching} onRefresh={() => void trips.refetch()} />}
         ListHeaderComponent={
-          trips.error && trips.data ? (
-            <Text selectable style={{ color: colors.destructive, fontSize: 14, paddingBottom: 6 }}>
-              Couldn&apos;t refresh. {trips.error.message}
-            </Text>
-          ) : undefined
+          <View style={{ gap: 16, paddingBottom: 6 }}>
+            <Section>
+              <ActionRow label="Islands" onPress={() => router.push("/manage/islands")} />
+            </Section>
+            {trips.error && trips.data && (
+              <Text selectable style={{ color: colors.destructive, fontSize: 14 }}>
+                Couldn&apos;t refresh. {trips.error.message}
+              </Text>
+            )}
+          </View>
         }
         renderItem={({ item }) => (
           <Pressable

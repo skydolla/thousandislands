@@ -104,14 +104,20 @@ function TripForm({ tripId, trip, onSaved }: { tripId?: string; trip?: Trip; onS
   const update = (patch: Partial<Draft>) => setDraft((d) => ({ ...d, ...patch }));
   const dirty = JSON.stringify(payloadOf(draft)) !== JSON.stringify(payloadOf(saved));
 
-  // An island created on the "New island" screen comes back here.
+  // An island created on the "New island" screen, or edited on its own screen, comes back here.
   useFocusEffect(
     useCallback(() => {
       const island = takeHandedOffIsland();
-      if (island) {
-        setDraft((d) => ({ ...d, islands: [...d.islands, { island }] }));
-        setAddingIsland(false);
-      }
+      if (!island) return;
+      const update = (i: EditorIsland) => (i.island.id === island.id ? { ...i, island } : i);
+      setDraft((d) =>
+        d.islands.some((i) => i.island.id === island.id)
+          ? { ...d, islands: d.islands.map(update) }
+          : { ...d, islands: [...d.islands, { island }] }
+      );
+      // Edits are already saved, so the saved copy takes them too and they don't count as unsaved.
+      setSaved((s) => ({ ...s, islands: s.islands.map(update) }));
+      setAddingIsland(false);
     }, [])
   );
 
@@ -239,7 +245,17 @@ function TripForm({ tripId, trip, onSaved }: { tripId?: string; trip?: Trip; onS
         {draft.islands.map((item, index) => (
           <View key={item.island.id} style={{ flexDirection: "row", alignItems: "center", minHeight: 52, paddingLeft: 16, paddingRight: 8, gap: 10 }}>
             <Text style={{ width: 20, color: colors.tertiaryLabel, fontVariant: ["tabular-nums"] }}>{index + 1}</Text>
-            <View style={{ flex: 1, paddingVertical: 8 }}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityHint="Edits this island"
+              onPress={() =>
+                router.push({
+                  pathname: "/manage/islands/[islandId]",
+                  params: { islandId: item.island.id, fromTrip: "1" },
+                })
+              }
+              style={({ pressed }) => ({ flex: 1, paddingVertical: 8, opacity: pressed ? 0.6 : 1 })}
+            >
               <Text style={{ color: colors.label, fontSize: 16 }} numberOfLines={1}>
                 {item.island.name}
               </Text>
@@ -247,7 +263,7 @@ function TripForm({ tripId, trip, onSaved }: { tripId?: string; trip?: Trip; onS
                 {[item.island.regionOrState, item.island.country].filter(Boolean).join(", ")}
                 {!item.saved && <Text style={{ color: colors.warning }}>  · not saved yet</Text>}
               </Text>
-            </View>
+            </Pressable>
             <IconButton symbol="arrow.up" label={`Move ${item.island.name} up`} disabled={index === 0} onPress={() => moveIsland(index, -1)} />
             <IconButton symbol="arrow.down" label={`Move ${item.island.name} down`} disabled={index === draft.islands.length - 1} onPress={() => moveIsland(index, 1)} />
             <IconButton symbol="minus.circle.fill" label={`Remove ${item.island.name}`} destructive onPress={() => removeIsland(index)} />
